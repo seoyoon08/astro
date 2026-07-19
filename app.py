@@ -177,7 +177,7 @@ with col_graph2:
 
 # 6. 교과 심층 연계 탐구 가이드 문서화
 st.markdown("---")
-st.subheader("💡 물리학II & 지구과학II 교과 개념 압축 코멘트 (세특 작성용 소스)")
+st.subheader("💡 물리학II & 지구과학II 교과 개념 압축 코멘트")
 
 st.success("""
 **🔬 물리학 II 연계 관점: 이체 역학과 에너지 보존**
