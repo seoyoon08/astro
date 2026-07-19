@@ -96,7 +96,7 @@ col_graph1, col_graph2 = st.columns(2)
 with col_graph1:
     st.subheader("🪐 1. 공통 질량 중심 기준 이체 궤도 운동 (우주 부감 뷰)")
     fig1, ax1 = plt.subplots(figsize=(6, 6))
-    ax1.plot(0, 0, 'kx', markersize=10, label="Barycenter (질량중심)")
+    ax1.plot(0, 0, 'kx', markersize=10, label="Barycenter")
     
     phi_vals = np.linspace(0, 2*np.pi, 200)
     x_s_orbit = r_star * np.cos(phi_vals)
@@ -113,12 +113,13 @@ with col_graph1:
     y_p = r_planet * np.sin(theta)
     
     ax1.plot([x_s, x_p], [y_s, y_p], 'gray', linestyle=':', alpha=0.6)
-    ax1.plot(x_s, y_s, 'ro', markersize=14, label="Star (중심 별)")
-    ax1.plot(x_p, y_p, 'go', markersize=7, label="Exoplanet (외계행성)")
+    ax1.plot(x_s, y_s, 'ro', markersize=14, label="Star")
+    ax1.plot(x_p, y_p, 'go', markersize=7, label="Exoplanet")
     
+    # 화살표 및 관측자 표시 영문화 (이모지 제거)
     ax1.annotate('', xy=(0, -r_planet*0.5), xytext=(0, -r_planet*1.1),
                 arrowprops=dict(facecolor='purple', shrink=0.05, width=2, headwidth=8))
-    ax1.text(0, -r_planet*1.2, "👁️ 지구 관측자 시선 (Toward +Y)", color='purple', ha='center', fontsize=10)
+    ax1.text(0, -r_planet*1.2, "To Earth Observer (+Y Line of Sight)", color='purple', ha='center', fontsize=10)
     
     ax1.set_xlim(-r_planet*1.3, r_planet*1.3)
     ax1.set_ylim(-r_planet*1.3, r_planet*1.3)
@@ -137,23 +138,24 @@ with col_graph2:
     v_rad_line = v_star_m_s * np.sin(i_rad) * np.sin(2 * np.pi * phases_line)
     ax2.plot(phases_line, v_rad_line, 'purple', linewidth=2.5, label="Radial Velocity Curve")
     
+    # 그래프 안 박스 텍스트 영문화 (이모지 제거하여 깨짐 원천 차단)
     if v_radial > 0.5:
         point_color = 'red'
-        status_text = f"🔴 적색편이 (멀어지는 중: +{v_radial:.1f} m/s)\nΔλ = +{delta_lambda:.4f} nm"
+        status_text = f"Redshift (Moving Away)\nVr = +{v_radial:.1f} m/s\nΔλ = +{delta_lambda:.4f} nm"
     elif v_radial < -0.5:
         point_color = 'blue'
-        status_text = f"🔵 청색편이 (다가오는 중: {v_radial:.1f} m/s)\nΔλ = {delta_lambda:.4f} nm"
+        status_text = f"Blueshift (Approaching)\nVr = {v_radial:.1f} m/s\nΔλ = {delta_lambda:.4f} nm"
     else:
         point_color = 'black'
-        status_text = "⚪ 시선 속도 변화 없음 (횡운동 상태)"
+        status_text = "No Shift (Tangential Motion)"
         
-    ax2.plot(phase, v_radial, color=point_color, marker='o', markersize=10, label="Current Observation")
+    ax2.plot(phase, v_radial, color=point_color, marker='o', markersize=10, label="Current Obs.")
     ax2.axhline(0, color='gray', linestyle='--', alpha=0.5)
     
     y_bound = max(v_star_m_s * np.sin(i_rad) * 1.3, 10.0)
     ax2.set_ylim(-y_bound, y_bound)
-    ax2.set_xlabel("공전 위상 (Orbital Phase)", fontsize=9)
-    ax2.set_ylabel("별의 시선 속도 (Radial Velocity, m/s)", fontsize=9)
+    ax2.set_xlabel("Orbital Phase", fontsize=9)
+    ax2.set_ylabel("Radial Velocity of Star (m/s)", fontsize=9)
     ax2.grid(True, alpha=0.3)
     ax2.legend(loc="upper right", fontsize=8)
     
