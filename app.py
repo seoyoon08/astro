@@ -1,7 +1,3 @@
-import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
-
 # 1. 웹 페이지 기본 설정
 st.set_page_config(page_title="물리II x 지학II 외계행성 탐사 시뮬레이터", layout="wide")
 
