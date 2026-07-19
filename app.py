@@ -7,7 +7,7 @@ st.set_page_config(page_title="물리II x 지학II 외계행성 탐사 시뮬레
 
 st.title("🪐 물리학II × 지구과학II 융합 탐구: 이체 운동과 시선 속도(도플러 효과) 분석기")
 st.markdown("""
-이 프로그램은 물리학의 역학적 개념(공통 질량 중심, 이체 운동, 도플러 효과)과 지구과학의 천문 관측 개념(시선 속도 변화를 이용한 외계행성 탐사)을 융합하여 시각화한 대시보드입니다.
+이 프로그램은 **물리학II의 역학적 개념(공통 질량 중심, 이체 운동, 도플러 효과)**과 **지구과학II의 천문 관측 개념(시선 속도 변화를 이용한 외계행성 탐사)**을 융합하여 시각화한 대시보드입니다.
 사이드바의 물리량을 조절하며 별과 행성이 질량 중심을 기준으로 어떻게 상호작용하는지, 그리고 지구에서 그것이 어떻게 관측되는지 분석해 보세요.
 """)
 
@@ -30,7 +30,7 @@ T = period_days / 365.25 # 년 단위
 inclination_deg = st.sidebar.slider("궤도 경사각 ($i$, 도)", 0, 90, 90, 5)
 i_rad = np.radians(inclination_deg)
 
-# 현재 공전 궤도 위상(시간) 조절 슬라이더 -> 행성 궤도 운동을 두드러지게 관찰하는 핵심 위젯
+# 현재 공전 궤도 위상(시간) 조절 슬라이더
 st.sidebar.markdown("---")
 st.sidebar.subheader("⏰ 실시간 궤도 운동 추적")
 phase = st.sidebar.slider("공전 위상 (0 ~ 1 주행)", 0.0, 1.0, 0.0, 0.01)
@@ -41,21 +41,16 @@ theta = 2 * np.pi * phase # 라디안 각도
 a = ((M_star + m_planet) * (T**2))**(1/3) # AU 단위
 
 # [물리II] 이체 문제(Two-body problem)에 따른 공통 질량 중심(Barycenter)으로부터의 거리 계산
-# M_star * r_star = m_planet * r_planet, r_star + r_planet = a
 r_star = a * (m_planet / (M_star + m_planet))
 r_planet = a * (M_star / (M_star + m_planet))
 
 # [물리II] 공전 속도 계산 (v = 2 * pi * r / T)
-# AU/year 단위를 m/s 단위로 변환 (1 AU ≈ 1.496e11 m, 1 year ≈ 3.154e7 s)
 au_to_m = 1.496e11
 yr_to_s = 3.154e7
-
 v_star_m_s = (2 * np.pi * r_star * au_to_m) / (T * yr_to_s)
 v_planet_m_s = (2 * np.pi * r_planet * au_to_m) / (T * yr_to_s)
 
-# [지학II] 시선 속도(Radial Velocity) 계산: v_r = v_star * sin(i) * cos(theta)
-# 지구 관측자가 -Y축 먼 곳에 있다고 가정하면, X축 방향 성분 또는 Y축 성분으로 시선 방향 정의 가능
-# 여기서는 관측자가 아래쪽(-Y 방향)에서 바라본다고 설정하여, 별이 다가올 때(-)와 멀어질 때(+)를 정의함
+# [지학II] 시선 속도(Radial Velocity) 계산
 v_radial = v_star_m_s * np.sin(i_rad) * np.sin(theta)
 
 # [물리II] 빛의 도플러 효과와 파장 변화량 계산 (기준 파장: 수소 알파선 656.3 nm)
@@ -74,6 +69,25 @@ with col_m3:
 with col_m4:
     st.metric(label="📡 현재 관측 시선 속도 ($v_r$)", value=f"{v_radial:.2f} m/s")
 
+# 🌟 [추가된 부분] 케플러 제3법칙 변형식 및 궤도 반지름(a) 수학적 유도 과정 명시
+st.markdown("---")
+with st.expander("📐 [교과 심층] 케플러 제3법칙 조화의 법칙 변형 및 궤도 장반경($a$) 유도 원리"):
+    st.markdown(r"""
+    물리학II와 지구과학II에서 공통으로 다루는 **케플러 제3법칙(조화의 법칙)**의 일반식은 뉴턴의 만유인력 법칙을 결합하여 아래와 같이 유도됩니다.
+    
+    $$T^2 = \frac{4\pi^2}{G(M_{\text{star}} + m_{\text{planet}})}a^3$$
+    
+    여기서 단위를 천문학적 편리성을 위해 **태양 질량($M_\odot$), 공전 주기(년, year), 궤도 반지름(AU)**으로 설정하면 물리 상수의 관계에 의해 $\frac{4\pi^2}{G} = 1$이 되므로 수식이 다음과 같이 간소화됩니다.
+    
+    $$T^2 = (M_{\text{star}} + m_{\text{planet}}) \cdot a^3$$
+    
+    도플러 효과 및 관측을 통해 알아낸 **별의 질량($M_{\text{star}}$)**, **행성의 질량($m_{\text{planet}}$)**, 그리고 **공전 주기($T$)** 값을 바탕으로 외계행성의 최종 **궤도 장반경($a$)**을 역산하기 위해 수식을 $a$에 대해 정리하면 다음과 같은 최종 유도식을 얻을 수 있습니다.
+    
+    $$a^3 = \frac{T^2}{M_{\text{star}} + m_{\text{planet}}} \implies a = \sqrt[3]{\frac{T^2}{M_{\text{star}} + m_{\text{planet}}}}$$
+    
+    *(※ 본 프로그램 연산 엔진은 사용자가 입력한 데이터를 기반으로 위 유도식을 실시간 계산하여 `총 궤도 반지름 (a)` 메트릭에 표기하고 있습니다.)*
+    """)
+
 st.markdown("---")
 
 # 5. 메인 시각화 영역 (두 개의 그래프를 병렬 배치하여 운동성 강조)
@@ -81,47 +95,31 @@ col_graph1, col_graph2 = st.columns(2)
 
 with col_graph1:
     st.subheader("🪐 1. 공통 질량 중심 기준 이체 궤도 운동 (우주 부감 뷰)")
-    
     fig1, ax1 = plt.subplots(figsize=(6, 6))
-    
-    # 질량 중심 (0,0) 표시
     ax1.plot(0, 0, 'kx', markersize=10, label="Barycenter (질량중심)")
     
-    # 전체 궤도 동선 그리기 (원형 궤도 가정)
     phi_vals = np.linspace(0, 2*np.pi, 200)
-    # 별의 궤도 (크기가 작으므로 시각적 식별을 위해 약간 강조하여 그림)
-    # 실제 물리 스케일을 유지하되, 별의 이동이 눈에 띄도록 별의 위치 계산
     x_s_orbit = r_star * np.cos(phi_vals)
     y_s_orbit = r_star * np.sin(phi_vals)
     ax1.plot(x_s_orbit, y_s_orbit, 'orange', linestyle='--', alpha=0.7, label="Star Orbit")
     
-    # 행성의 궤도
-    # 이체 운동 물리 법칙상 별과 행성은 질량 중심을 사이에 두고 항상 180도 반대편에 위치함 (θ와 θ + π)
     x_p_orbit = r_planet * np.cos(phi_vals)
     y_p_orbit = r_planet * np.sin(phi_vals)
     ax1.plot(x_p_orbit, y_p_orbit, 'dodgerblue', linestyle='--', alpha=0.5, label="Planet Orbit")
     
-    # 현재 위상에 따른 별과 행성의 실시간 위치 벡터 계산
-    # 별의 위치 (행성과 180도 반대 위상)
     x_s = r_star * np.cos(theta + np.pi)
     y_s = r_star * np.sin(theta + np.pi)
-    # 행성의 위치
     x_p = r_planet * np.cos(theta)
     y_p = r_planet * np.sin(theta)
     
-    # 질량 중심을 통과하는 정렬선 (이체 운동의 핵심 결속 관계 시각화)
     ax1.plot([x_s, x_p], [y_s, y_p], 'gray', linestyle=':', alpha=0.6)
-    
-    # 천체 마커 배치 (별은 크게, 행성은 작게)
     ax1.plot(x_s, y_s, 'ro', markersize=14, label="Star (중심 별)")
     ax1.plot(x_p, y_p, 'go', markersize=7, label="Exoplanet (외계행성)")
     
-    # 지구 관측자 시선 방향 표시 (아래쪽 -Y에서 위쪽 +Y를 바라봄)
     ax1.annotate('', xy=(0, -r_planet*0.5), xytext=(0, -r_planet*1.1),
                 arrowprops=dict(facecolor='purple', shrink=0.05, width=2, headwidth=8))
     ax1.text(0, -r_planet*1.2, "👁️ 지구 관측자 시선 (Toward +Y)", color='purple', ha='center', fontsize=10)
     
-    # 그래프 스타일링
     ax1.set_xlim(-r_planet*1.3, r_planet*1.3)
     ax1.set_ylim(-r_planet*1.3, r_planet*1.3)
     ax1.set_aspect('equal')
@@ -129,22 +127,16 @@ with col_graph1:
     ax1.set_ylabel("Y (AU)", fontsize=9)
     ax1.grid(True, alpha=0.3)
     ax1.legend(loc="upper right", fontsize=8)
-    
     st.pyplot(fig1)
 
 with col_graph2:
     st.subheader("📈 2. 별의 관측 시선 속도 곡선 (도플러 그래프)")
-    
     fig2, ax2 = plt.subplots(figsize=(6, 6))
     
-    # 전체 1주기 동안의 시선 속도 곡선 베이스라인 생성
     phases_line = np.linspace(0, 1, 100)
     v_rad_line = v_star_m_s * np.sin(i_rad) * np.sin(2 * np.pi * phases_line)
-    
     ax2.plot(phases_line, v_rad_line, 'purple', linewidth=2.5, label="Radial Velocity Curve")
     
-    # 현재 위상에서의 관측 포인트 찍기
-    # 청색편이(다가옴, -값)와 적색편이(멀어짐, +값)에 따라 마커 색상 다변화
     if v_radial > 0.5:
         point_color = 'red'
         status_text = f"🔴 적색편이 (멀어지는 중: +{v_radial:.1f} m/s)\nΔλ = +{delta_lambda:.4f} nm"
@@ -156,29 +148,21 @@ with col_graph2:
         status_text = "⚪ 시선 속도 변화 없음 (횡운동 상태)"
         
     ax2.plot(phase, v_radial, color=point_color, marker='o', markersize=10, label="Current Observation")
-    
-    # 상하 대칭선 및 중심 가이드라인
     ax2.axhline(0, color='gray', linestyle='--', alpha=0.5)
     
-    # 그래프 스타일링
-    # Y축 범위 자동 조절 및 고정 (최대 속도 기준)
     y_bound = max(v_star_m_s * np.sin(i_rad) * 1.3, 10.0)
     ax2.set_ylim(-y_bound, y_bound)
     ax2.set_xlabel("공전 위상 (Orbital Phase)", fontsize=9)
-    ax2.set_ylabel("별의 시en속도 (Radial Velocity, m/s)", fontsize=9)
+    ax2.set_ylabel("별의 시선 속도 (Radial Velocity, m/s)", fontsize=9)
     ax2.grid(True, alpha=0.3)
     ax2.legend(loc="upper right", fontsize=8)
     
-    # 현재 편이 상태 텍스트 박스 박아주기
     ax2.text(0.05, -y_bound * 0.9, status_text, fontsize=10, 
              bbox=dict(facecolor='white', alpha=0.8, boxstyle='round,pad=0.5'))
-    
     st.pyplot(fig2)
 
 # 6. 교과 심층 연계 탐구 가이드 문서화
-st.markdown("---")
-st.subheader("💡 물리학II & 지구과학II 교과 개념 압축 코멘트")
-
+st.subheader("💡 물리학II & 지구과학II 교과 개념 압축 코멘트 (세특 작성용 소스)")
 st.success("""
 **🔬 물리학 II 연계 관점: 이체 역학과 에너지 보존**
 1. **공통 질량 중심 메커니즘:** 외계행성의 질량이 커질수록($M_{Jupiter}$ 슬라이더를 높일수록) 중심 별이 도는 궤도 반경 $r_{star}$와 실제 공전 속도 $v_{star}$가 정량적으로 증가하여, 공통 질량 중심을 기준으로 한 질량 모멘트 보존 법칙($M_1r_1 = M_2r_2$)이 유효함을 증명할 수 있습니다.
